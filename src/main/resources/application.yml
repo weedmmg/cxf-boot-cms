@@ -1,0 +1,58 @@
+spring:
+  mvc:
+    view:
+       prefix: /templates/
+       suffix: .ftl
+  freemarker:
+     cache: false
+     request-context-attribute: request
+  application:
+    name: user-service
+  
+    
+
+# Define the port where the UAA server would be running
+server:
+  port: 8881
+  # Use different context-path to avoid session cookie overlapping
+  context-path: /uaa
+  use-forward-headers: false
+
+
+# Define the Eureka server that handles service registration
+eureka:
+  instance:
+      hostname: localhost
+      port: 8006
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${eureka.instance.port}/eureka/
+
+# Define security
+jwt:
+  header: Authorization
+  secret: cxfSecret
+  expiration: 604800
+  tokenHead: "cxfauthor "
+  route:
+    authentication:
+      login: /uaa/login
+      refresh: /uaa/refresh
+      register: "/uaa/auth/register"
+
+logging:
+  level.org.springframework.security: DEBUG
+
+---
+spring:
+  profiles: docker
+
+server:
+  port: ${SERVICE_PORT}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${REGISTRY_URL}
